@@ -13,6 +13,7 @@ import java.io.PrintWriter;
 import java.util.Arrays;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 /**
  *
@@ -54,7 +55,8 @@ public class timediff{
                     Date timeStart=format.parse(time1);
                     Date timeEnd=format.parse(time2);
                     long diff=timeEnd.getTime()-timeStart.getTime();
-                    long diffMinutes= diff / (60 * 1000) % 60;
+                    //long diffMinutes= diff / (60 * 1000) % 60;
+                    long diffMinutes = TimeUnit.MILLISECONDS.toMinutes(diff); 
                     System.out.print(diffMinutes + " minutes, ");
                     String strLong = Long.toString(diffMinutes);
                     lineArray[count]=current;

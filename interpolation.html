@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<body>
+<style>
+  body {
+    background-image: url("Lekagul Roadways labeled v2.jpg");
+    background-repeat: no-repeat;
+  }
+
+  path {
+    fill: none;
+    stroke: #000;
+    stroke-width: 3px;
+  }
+
+  circle {
+    fill: steelblue;
+    stroke: #fff;
+    stroke-width: 3px;
+  }
+</style>
+<script src="//d3js.org/d3.v3.min.js"></script>
+<script>
+  //NOTE: should update code so it's compatible with d3 v4
+  
+  d3.csv("Lekagul Sensor Data.csv", function(error, data) {
+    //attempting to get time data from the csv file. This has not yet been implemented and should have no impact on the code.
+    var fields = function() {
+    var currentTime, hour, minute, second;
+    currentTime = new Date();
+    second = currentTime.getSeconds();
+    minute = currentTime.getMinutes();
+    hour = currentTime.getHours() + minute / 60;
+    return data = [
+      {
+        "unit": "seconds",
+        "numeric": second
+      }, {
+        "unit": "minutes",
+        "numeric": minute
+      }, {
+        "unit": "hours",
+        "numeric": hour
+      }
+    ];
+  };
+  })
+
+  //create dataset points
+  var points = [
+    [545, 53],
+    [644, 258],
+    [580, 439],
+    [515, 164]
+  ];
+
+  var svg = d3.select("body").append("svg")
+      .attr("width", 960)
+      .attr("height", 500);
+
+  var path = svg.append("path")
+      .data([points])
+      .attr("d", d3.svg.line()
+      //.tension(0) // Catmull–Rom
+      .interpolate("cardinal-closed"));
+
+  svg.selectAll(".point")
+      .data(points)
+    .enter().append("circle")
+      .attr("r", 4)
+      .attr("transform", function(d) { return "translate(" + d + ")"; });
+
+  var circle = svg.append("circle")
+      .attr("r", 13)
+      .attr("transform", "translate(" + points[0] + ")");
+
+  transition();
+
+  function transition() {
+    circle.transition()
+        .duration(10000)
+        .attrTween("transform", translateAlong(path.node()))
+        .each("end", transition);
+  }
+
+  /* for finding the coordinates of each stop
+  function logMousePos(event) {
+    console.log("clientX: " + event.clientX + " - clientY: " + event.clientY);
+  }
+
+  document.addEventListener("click", logMousePos); */
+
+  // Returns an attrTween for translating along the specified path element.
+  function translateAlong(path) {
+    var l = path.getTotalLength();
+    return function(d, i, a) {
+      return function(t) {
+        var p = path.getPointAtLength(t * l);
+        return "translate(" + p.x + "," + p.y + ")";
+      };
+    };
+  }
+</script>

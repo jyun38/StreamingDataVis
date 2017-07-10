@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type="text/css">
+        .node {}
+
+        .link { stroke: #999; stroke-opacity: .6; stroke-width: 1px; }
+        .visualization {
+            margin: auto;
+            width: 60%;
+            /*border: 3px solid #73AD21;*/
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class = "visualization">
+    <svg width="1900" height="2000"></svg>
+</div>
+
+<script src="http://d3js.org/d3.v4.min.js" type="text/javascript"></script>
+<script src="http://d3js.org/d3-selection-multi.v1.js"></script>
+
+<script type="text/javascript">
+// data = [{"name": "entrance0","cx" : 310, "cy" : 75, "color" : "green"},
+//         {"name": "entrance1","cx" : 90, "cy" : 330, "color" : "green"},
+//         {"name": "entrance2","cx" : 900, "cy" : 430, "color" : "green"},
+// ]
+
+data = [
+{"name": "entrance0","cx" : 310,"cy" : 75, "color" : "green"},
+{"name": "entrance1","cx" : 90,"cy" : 330, "color" : "green"},
+{"name": "entrance2","cx" : 900,"cy" : 430, "color" : "green"},
+{"name": "entrance3","cx" : 570,"cy" : 820, "color" : "green"},
+{"name": "entrance4","cx" : 690,"cy" : 900, "color" : "green"},
+{"name": "gate0", "cx" : 310,"cy" : 170,"color" : "red"},
+{"name": "gate1", "cx" : 290,"cy" : 220,"color" : "red"},
+{"name": "gate2", "cx" : 110,"cy" : 270,"color" : "red"},
+{"name": "gate3", "cx" : 730,"cy" : 300,"color" : "red"},
+{"name": "gate4", "cx" : 810,"cy" : 560,"color" : "red"},
+{"name": "gate5", "cx" : 640,"cy" : 720,"color" : "red"},
+{"name": "gate6", "cx" : 570,"cy" : 740,"color" : "red"},
+{"name": "gate7", "cx" : 480,"cy" : 790,"color" : "red"},
+{"name": "gate8", "cx" : 670,"cy" : 890,"color" : "red"},
+{"name": "general-gate0", "cx" : 540, "cy" : 60,"color" : "blue"},
+{"name": "general-gate1", "cx" : 318, "cy" : 130, "color" : "blue"},
+{"name": "general-gate2", "cx" : 510, "cy" : 160, "color" : "blue"},
+{"name": "general-gate3", "cx" : 910, "cy" : 274, "color" : "blue"},
+{"name": "general-gate4", "cx" : 340, "cy" : 480, "color" : "blue"},
+{"name": "general-gate5", "cx" : 610, "cy" : 548, "color" : "blue"},
+{"name": "general-gate6", "cx" : 670, "cy" : 675, "color" : "blue"},
+{"name": "general-gate7", "cx" : 320, "cy" : 710, "color" : "blue"},
+{"name": "ranger-base","cx" : 630, "cy" : 860, "color" : "magenta"},
+{"name": "ranger-stop0", "cx" : 440, "cy" : 90, "color" : "tan"},
+{"name": "ranger-stop1", "cx" : 90, "cy" : 110, "color" : "tan"},
+{"name": "ranger-stop2", "cx" : 390, "cy" : 180, "color" : "tan"},
+{"name": "ranger-stop3", "cx" : 730, "cy" : 210, "color" : "tan"},
+{"name": "ranger-stop4", "cx" : 90, "cy" : 470, "color" : "tan"},
+{"name": "ranger-stop5", "cx" : 740, "cy" : 580, "color" : "tan"}, 
+{"name": "ranger-stop6", "cx" : 610, "cy" : 720, "color" : "tan"},
+{"name": "ranger-stop7", "cx" : 490, "cy" : 750, "color" : "tan"}, 
+{"name": "camping0","cx" : 250, "cy" : 200, "color" : "orange"},
+{"name": "camping1","cx" : 630, "cy" : 240, "color" : "orange"},
+{"name": "camping2","cx" : 218, "cy" : 310, "color" : "orange"},
+{"name": "camping3","cx" : 225, "cy" : 320, "color" : "orange"},
+{"name": "camping4","cx" : 230, "cy" : 440, "color" : "orange"},
+{"name": "camping5","cx" : 88, "cy" : 600, "color" : "orange"},
+{"name": "camping6","cx" : 738, "cy" : 840, "color" : "orange"},
+{"name": "camping7","cx" : 890, "cy" : 710, "color" : "orange"},
+{"name": "camping8","cx" : 900, "cy" : 240, "color" : "orange"},]
+
+
+var green = "#74eb2f"
+var red = "#b03935"
+var orange = "#e67442"
+var tan = "#d7d473"
+var magenta = "#cd1cb5"
+var blue = "#55dad9"
+
+var svg = d3.select("svg"),
+    width = +svg.attr("width"),
+    height = +svg.attr("height"),
+    node,
+    edge;
+var layer1 = svg.append('g');
+var layer2 = svg.append('g');
+
+var circle = layer2.selectAll("circle")
+    .data(data);
+
+
+var circleEnter = circle.enter().append("circle")
+    .attr("cy", function(d){return d.cy*2})
+    .attr("cx", function(d){return d.cx*2})
+    .attr("r", 8)
+    .attr("id", function(d){return d.name})
+    .attr("fill", function(d){
+        if (d.color == "green"){
+            return green;
+        }
+        if (d.color == "red"){
+            return red;
+        }
+        if (d.color == "orange"){
+            return orange;
+        }
+        if (d.color == "tan"){
+            return tan;
+        }
+        if (d.color == "magenta"){
+            return magenta
+        }
+        if (d.color == "blue"){
+            return blue;
+        }
+    })
+    .append("svg:title")
+    .text(function(d){return d.name});
+
+
+d3.csv("traffic_averages.csv", function(gateData) {
+    var color = d3.scaleLinear()
+        .domain([-500, 7500])
+        .range(["white","red"]);
+    var edges = layer1.selectAll("line")
+        .data(gateData);
+    var lineEnter = edges.enter().append("line")
+                         .attr("x1", function(d){
+                            let start = d3.select("#"+d["startgate "])
+                            return start["_groups"][0][0].attributes[1].nodeValue
+                         })
+                         .attr("y1", function(d){
+                            let start = d3.select("#"+d["startgate "])
+                            return start["_groups"][0][0].attributes[0].nodeValue
+                         })
+                         .attr("x2",function(d){
+                            let end = d3.select("#"+d["endgate "])
+                            return end["_groups"][0][0].attributes[1].nodeValue
+                         })
+                         .attr("y2",function(d){
+                            let end = d3.select("#"+d["endgate "])
+                            return end["_groups"][0][0].attributes[0].nodeValue
+                         })
+                         .attr("stroke-width",0)
+                         .transition()
+                            .delay(function(d,i){return i*8})
+                             .attr("stroke-width", 5)
+                             .attr("stroke", function(d){
+                                return color(d["totaltraffic "])})
+                             
+
+
+})
+
+// class Node{
+//     constructor(name, cx, cy, color, svg){
+//         this.name = name
+//         this.cx = cx
+//         this.cy = cy
+//         this.color = color
+//         this.svg = svg
+// }
+//     render(){
+//         this.circle = svg.append("circle")
+//                 .attr('r',5)
+//                 .attr('fill',"#000000")
+//                 .attr('cx',this.cx)
+//                 .attr('cy',this.cy)
+//                 .attr('fill',this.color)
+//                 .append("svg:title") //tooltip (mouseover)
+//                 .text(this.name);
+
+//     }
+//     renderLabel(){
+//         let offset=10
+//         this.text = svg.append("text")
+//             .text(this.name)
+//             .attr("x",this.cx -offset)
+//             .attr("y",this.cy-offset)
+//             .attr("font-family","sans-serif")
+//             .attr("font-size","15px")
+//             .attr("fill","black");
+
+
+//     }
+
+// }
+
+
+
+// var svg = d3.select("svg"),
+//     width = +svg.attr("width"),
+//     height = +svg.attr("height"),
+//     node,
+//     edge;
+// var edges = []
+// var nodes = []
+// var green = "#74eb2f"
+// var red = "#b03935"
+// var orange = "#e67442"
+// var tan = "#d7d473"
+// var magenta = "#cd1cb5"
+// var blue = "#55dad9"
+// nodes.push(new Node("entrance0",310,75,green,svg))
+// nodes.push(new Node("entrance1",90,330,green,svg))
+// nodes.push(new Node("entrance2",900,430,green,svg))
+// nodes.push(new Node("entrance3",570,820,green,svg))
+// nodes.push(new Node("entrance4",690,900,green,svg))
+// nodes.push(new Node("gate0",310,170,red,svg))
+// nodes.push(new Node("gate1",290,220,red,svg))
+// nodes.push(new Node("gate2",110,270,red,svg))
+// nodes.push(new Node("gate3",730,300,red,svg))
+// nodes.push(new Node("gate4",810,560,red,svg))
+// nodes.push(new Node("gate5",640,720,red,svg))
+// nodes.push(new Node("gate6",570,740,red,svg))
+// nodes.push(new Node("gate7",480,790,red,svg))
+// nodes.push(new Node("gate8",670,890,red,svg))
+// nodes.push(new Node("general-gate0",540,60,blue,svg))
+// nodes.push(new Node("general-gate1",318,130,blue,svg))
+// nodes.push(new Node("general-gate2",510,160,blue,svg))
+// nodes.push(new Node("general-gate3",910,274,blue,svg))
+// nodes.push(new Node("general-gate4",340,480,blue,svg))
+// nodes.push(new Node("general-gate5",610,548,blue,svg))
+// nodes.push(new Node("general-gate6",670,675,blue,svg))
+// nodes.push(new Node("general-gate7",320,710,blue,svg))
+// nodes.push(new Node("ranger-base",630,860,magenta,svg))
+// nodes.push(new Node("ranger-stop0",440,90,tan,svg))
+// nodes.push(new Node("ranger-stop1",90,110,tan,svg))
+// nodes.push(new Node("ranger-stop2",390,180,tan,svg))
+// nodes.push(new Node("ranger-stop3",730,210,tan,svg))
+// nodes.push(new Node("ranger-stop4",90,470,tan,svg))
+// nodes.push(new Node("ranger-stop5",740,580,tan,svg)) 
+// nodes.push(new Node("ranger-stop6",610,720,tan,svg))
+// nodes.push(new Node("ranger-stop7",490,750,tan,svg)) 
+// nodes.push(new Node("camping0",250,200,orange,svg))
+// nodes.push(new Node("camping1",630,240,orange,svg))
+// nodes.push(new Node("camping2",218,310,orange,svg))
+// nodes.push(new Node("camping3",225,320,orange,svg))
+// nodes.push(new Node("camping4",230,440,orange,svg))
+// nodes.push(new Node("camping5",88,600,orange,svg))
+// nodes.push(new Node("camping6",738,840,orange,svg))
+// nodes.push(new Node("camping7",890,710,orange,svg))
+// nodes.push(new Node("camping8",900,240,orange,svg))
+
+
+// for (var i = 0; i<nodes.length;i++){
+
+//     nodes[i].render()
+//     nodes[i].renderLabel()
+// }
+// d3.csv("traffic_averages.csv", function(data) {
+// // var link = svg.append("line")
+// //     .attr(
+// //   console.log(data[0]);
+// i = 0
+// for (var i = 0; i<data.length; i++){
+//     var startgate
+//     var endgate
+//     var start 
+//     var end
+//     //console.log(data[i])
+//     for (var j = 0; j<nodes.length;j++){
+//         if (nodes[j].name == data[i].startgate){
+//             startgate = nodes[j]
+//             console.log("found startgate")
+//             // console.log(j)
+//             // console.log(nodes[i].name)
+//             start = true
+      
+//         }
+
+//         if (nodes[j].name == data[i].endgate){
+//             endgate = nodes[j];
+//             end = true 
+
+//         }
+
+//         if(start == true && end == true){
+//         let edge = svg.append("line")   
+//             edge
+//                 .attr('x1',startgate.cx)
+//                 .attr('y1',startgate.cy)
+//                 .attr('x2',endgate.cx)
+//                 .attr('y2',endgate.cy)
+//                 .attr('stroke-width',2)
+//                 .attr("stroke","black");
+//             }
+//         end = false
+//         start = false
+//                 //.attr('stroke',"")
+//     }
+
+
+
+// }
+// });
+
+// console.log(nodes[0].name)
+// console.log(nodes[0].cx)
+
+// entrance3
+// general-gate1
+// ranger-stop2
+// ranger-stop0
+// general-gate2
+// general-gate5
+// entrance4
+// entrance1
+// general-gate7
+// general-gate4
+// entrance2
+// camping6
+// camping2
+// camping3
+// ranger-base
+// gate8
+// camping0
+// gate3
+// ranger-stop3
+// camping8
+// general-gate3
+// general-gate6
+// gate4
+// camping7
+// ranger-stop5
+// gate5
+// ranger-stop6
+// entrance0
+// camping5
+// ranger-stop4
+// gate6
+// gate7
+// ranger-stop7
+// camping4
+// gate2
+// ranger-stop1
+// general-gate0
+// camping1
+// gate1
+// gate0
+
+
+// var edges {
+
+// }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // var svg = d3.select("svg"),
+    //     width = +svg.attr("width"),
+    //     height = +svg.attr("height"),
+    //     node,
+    //     edge;
+
+    // d3.json("graph-testing.json", function (error, graph) {
+    //     if (error) throw error;
+    //     update(graph.edges, graph.nodes);
+    // })
+
+    // function update(edges, nodes) {
+    //     edge = svg.selectAll(".edge")
+    //         .data(edges) //attach edge data to the edges 
+    //         .enter()
+    //         .append("line")
+    //         .attr("class","edge") //gives it a class for css to target
+    //         .attr('marker-end','url(#arrowhead)') //Adds arrow to end of line 
+    //     edge.append("title")
+    //         .text(function(d) {return d.edgeLabel;});
+
+    //     edgelabels = svg.selectAll(".edgelabel")
+    //         .data(edges)
+    //         .enter()
+    //         .append('text')
+    //         .style("pointer-events","none")
+    //         .attrs({
+    //             'class': 'edgelabel',
+    //             'id': function(d, i) {return 'edgelabel'+i},
+    //             'font-size': 10,
+    //             'fill': '#999'
+
+    //         });
+
+    //     node = svg.selectAll(".node")
+    //         .data(nodes)
+    //         .enter()
+    //         .append("g")
+    //         .attr("class","node")
+
+    //     node.append("circle")
+    //         .attr('r', 8)
+    //         .style("fill", function(d){ return d.color;})
+    //         .attr("cx",function(d){return d.cx;})
+    //         .attr("cy",function(d){return d.cy;})
+
+    //     edge
+
+
+
+
+
+
+
+    //     console.log(edges)
+    //     console.log(nodes)
+        
+
+    // }
+
+    // function ticked() {
+    //     link
+    //         .attr("x1", function (d) {return d.source.x;})
+    //         .attr("y1", function (d) {return d.source.y;})
+    //         .attr("x2", function (d) {return d.target.x;})
+    //         .attr("y2", function (d) {return d.target.y;});
+
+    //     node
+    //         .attr("transform", function (d) {return "translate(" + d.x + ", " + d.y + ")";});
+
+    //     edgepaths.attr('d', function (d) {
+    //         return 'M ' + d.source.x + ' ' + d.source.y + ' L ' + d.target.x + ' ' + d.target.y;
+    //     });
+
+    //     edgelabels.attr('transform', function (d) {
+    //         if (d.target.x < d.source.x) {
+    //             var bbox = this.getBBox();
+
+    //             rx = bbox.x + bbox.width / 2;
+    //             ry = bbox.y + bbox.height / 2;
+    //             return 'rotate(180 ' + rx + ' ' + ry + ')';
+    //         }
+    //         else {
+    //             return 'rotate(0)';
+    //         }
+    //     });
+    // }
+
+    // function dragstarted(d) {
+    //     if (!d3.event.active) simulation.alphaTarget(0.3).restart()
+    //     d.fx = d.x;
+    //     d.fy = d.y;
+    // }
+
+    // function dragged(d) {
+    //     d.fx = d3.event.x;
+    //     d.fy = d3.event.y;
+    // }
+
+//    function dragended(d) {
+//        if (!d3.event.active) simulation.alphaTarget(0);
+//        d.fx = undefined;
+//        d.fy = undefined;
+//    }
+
+</script>
+
+</body>
+</html>
